@@ -77,6 +77,10 @@ class FunctionSpace:
 
     def eval_derivative_basis_function_all(self, Xj, k=1):
         raise NotImplementedError
+        P = np.zeros((len(Xj), self.N + 1))
+        for j in range(self.N + 1):
+            P[:, j] = self.evaluate_derivative_basis_function(Xj, j, k)
+        return P
 
     def inner_product(self, u):
         us = map_expression_true_domain(
@@ -199,22 +203,31 @@ class Sines(Trigonometric):
             return lambda Xj: scale*np.cos((j+1)*np.pi*Xj)
 
     def L2_norm_sq(self, N):
+        # integral[0,1] sin^2(pi*x) dx
         return 0.5
 
 
 class Cosines(Trigonometric):
 
     def __init__(self, N, domain=(0, 1), bc=(0, 0)):
-        raise NotImplementedError
+        Trigonometric.__init__(self, N, domain=domain)
+        self.B = Dirichlet(bc, domain, self.reference_domain)
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        if sympy:
+            return sp.cos((j + 1) * sp.pi * x)
+        return lambda Xj: np.cos((j + 1) * np.pi * Xj)
 
     def derivative_basis_function(self, j, k=1):
-        raise NotImplementedError
+        scale = ((j + 1) * np.pi) ** k * {0: 1, 1: -1}[((k+1) // 2) % 2]
+        if k % 2 == 0:
+            return lambda Xj: scale * np.cos((j + 1) * np.pi * Xj)
+        else:
+            return lambda Xj: scale * np.sin((j + 1) * np.pi * Xj)
 
     def L2_norm_sq(self, N):
-        raise NotImplementedError
+        #integral[0,1] cos^2(pi*x) dx
+        return 0.5
 
 # Create classes to hold the boundary function
 
