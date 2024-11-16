@@ -76,7 +76,6 @@ class FunctionSpace:
         return P
 
     def eval_derivative_basis_function_all(self, Xj, k=1):
-        raise NotImplementedError
         P = np.zeros((len(Xj), self.N + 1))
         for j in range(self.N + 1):
             P[:, j] = self.evaluate_derivative_basis_function(Xj, j, k)
@@ -113,10 +112,12 @@ class Legendre(FunctionSpace):
         return self.basis_function(j).deriv(k)
 
     def L2_norm_sq(self, N):
-        raise NotImplementedError
+        L2 = [2/(2*i+1) for i in range(N+1)]
+        return L2
 
     def mass_matrix(self):
-        raise NotImplementedError
+        mass = sparse.diags(self.L2(self.N), 0, (self.N, self.N), format = 'csr')
+        return mass
 
     def eval(self, uh, xj):
         xj = np.atleast_1d(xj)
