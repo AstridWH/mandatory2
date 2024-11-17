@@ -7,7 +7,6 @@ from numpy.polynomial import Chebyshev as Cheb
 
 x = sp.Symbol('x')
 
-
 def map_reference_domain(x, d, r):
     return r[0] + (r[1]-r[0])*(x-d[0])/(d[1]-d[0])
 
@@ -99,7 +98,6 @@ class FunctionSpace:
 
 
 class Legendre(FunctionSpace):
-
     def __init__(self, N, domain=(-1, 1)):
         FunctionSpace.__init__(self, N, domain=domain)
 
@@ -126,7 +124,6 @@ class Legendre(FunctionSpace):
 
 
 class Chebyshev(FunctionSpace):
-
     def __init__(self, N, domain=(-1, 1)):
         FunctionSpace.__init__(self, N, domain=domain)
 
@@ -171,6 +168,7 @@ class Chebyshev(FunctionSpace):
             uj[i] = float(h) * quad(uv, 0, np.pi, args=(i,))[0]
         return uj
 
+
 class Trigonometric(FunctionSpace):
     """Base class for trigonometric function spaces"""
 
@@ -189,7 +187,6 @@ class Trigonometric(FunctionSpace):
 
 
 class Sines(Trigonometric):
-
     def __init__(self, N, domain=(0, 1), bc=(0, 0)):
         Trigonometric.__init__(self, N, domain=domain)
         self.B = Dirichlet(bc, domain, self.reference_domain)
@@ -212,7 +209,6 @@ class Sines(Trigonometric):
 
 
 class Cosines(Trigonometric):
-
     def __init__(self, N, domain=(0, 1), bc=(0, 0)):
         Trigonometric.__init__(self, N, domain=domain)
         self.B = Dirichlet(bc, domain, self.reference_domain)
@@ -236,7 +232,6 @@ class Cosines(Trigonometric):
 # Create classes to hold the boundary function
 
 class Dirichlet:
-
     def __init__(self, bc, domain, reference_domain):
         d = domain
         r = reference_domain
@@ -248,7 +243,6 @@ class Dirichlet:
 
 
 class Neumann:
-
     def __init__(self, bc, domain, reference_domain):
         d = domain
         r = reference_domain
@@ -355,7 +349,6 @@ class NeumannChebyshev(Composite, Chebyshev):
 
 
 class BasisFunction:
-
     def __init__(self, V, diff=0, argument=0):
         self._V = V
         self._num_derivatives = diff
@@ -378,13 +371,11 @@ class BasisFunction:
 
 
 class TestFunction(BasisFunction):
-
     def __init__(self, V, diff=0):
         BasisFunction.__init__(self, V, diff=diff, argument=0)
 
 
 class TrialFunction(BasisFunction):
-
     def __init__(self, V, diff=0):
         BasisFunction.__init__(self, V, diff=diff, argument=1)
 
