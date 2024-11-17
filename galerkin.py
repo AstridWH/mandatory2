@@ -75,6 +75,7 @@ class FunctionSpace:
         return P
 
     def eval_derivative_basis_function_all(self, Xj, k=1):
+        #Analogt med evaluer basis, bare derivert
         P = np.zeros((len(Xj), self.N + 1))
         for j in range(self.N + 1):
             P[:, j] = self.evaluate_derivative_basis_function(Xj, j, k)
@@ -118,6 +119,7 @@ class Legendre(FunctionSpace):
         return L2
 
     def mass_matrix(self):
+        #(P_j, P_i) = 2/2i+1 * kroneckerdelta, aka L2 * identitetsmatrise, lecture 8, (16)
         mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N+1, self.N+1), format = 'csr')
         return mass
 
@@ -152,6 +154,7 @@ class Chebyshev(FunctionSpace):
         return L2
 
     def mass_matrix(self):
+        #lecture 9, (27)
         mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N+1, self.N+1), format='csr')
         return mass
 
@@ -219,7 +222,7 @@ class Sines(Trigonometric):
 class Cosines(Trigonometric):
     def __init__(self, N, domain=(0, 1), bc=(0, 0)):
         Trigonometric.__init__(self, N, domain=domain)
-        self.B = Neumann(bc, domain, self.reference_domain)
+        self.B = Neumann(bc, domain, self.reference_domain) # cos(0) =\= 0
 
     def basis_function(self, j, sympy=False):
         if sympy:
@@ -229,14 +232,14 @@ class Cosines(Trigonometric):
     def derivative_basis_function(self, j, k=1):
         scale = (j * np.pi) ** k * {0: 1, 1: -1}[(k // 2) % 2]
         if k % 2 == 0:
-            return lambda Xj: scale * np.cos(j * np.pi * Xj)
+            return lambda Xj: scale * np.cos(j * np.pi * Xj) #swapped cuz swapped
         else:
             return lambda Xj: scale * np.sin(j * np.pi * Xj)
 
     def L2_norm_sq(self, N):
         #integral[0,1] cos^2(pi*x) dx = 0.5
         ans = np.full(shape=N+1, fill_value=0.5)
-        #ans[0] = 1
+        ans[0] = 1 #sin0 = 0
         return ans
 
 # Create classes to hold the boundary function
@@ -310,7 +313,7 @@ class DirichletLegendre(Composite, Legendre):
         self.S = sparse.diags((1, -1), (0, 2), shape=(N+1, N+3), format='csr')
 
     def basis_function(self, j, sympy=False):
-        #V_n = span{P_i-P_i+2}
+        #V_n = span{P_i-P_i+2} lecture 11 between (50) anf (51), think it's earlier, but couldn't find to source
         if sympy:
             return sp.legendre(j, x) - sp.legendre(j+2, x)
         return Leg.basis(j) - Leg.basis(j+2)
@@ -326,7 +329,7 @@ class NeumannLegendre(Composite, Legendre):
 
 
     def basis_function(self, j, sympy=False):
-        #P_j - [j*(j+1)]/(j+2)(j+3)  *  P_j+2
+        #P_j - [j*(j+1)]/(j+2)(j+3)  *  P_j+2, slides lecture 11, page 26
         if sympy:
             return sp.legendre(j, x) - j*(j+1)/((j+2)*(j+3))*sp.legendre(j+2, x)
         return Leg.basis(j) - j*(j+1)/((j+2)*(j+3))*Leg.basis(j + 2)
