@@ -306,19 +306,29 @@ class DirichletLegendre(Composite, Legendre):
         self.S = sparse.diags((1, -1), (0, 2), shape=(N+1, N+3), format='csr')
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        #V_n = span{P_i-P_i+2}
+        if sympy:
+            return sp.legendre(j, x) - sp.legendre(j+2, x)
+        return Leg.basis(j) - Leg.basis(j+2)
 
 
 class NeumannLegendre(Composite, Legendre):
     def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0):
-        raise NotImplementedError
+        Legendre.__init__(self, N, domain=domain)
+        self.B = Neumann(bc, domain, self.reference_domain)
+        self.constraint = constraint
+        S_temp = [-j*(j+1)/((j+2)*(j+3)) for j in range(N+1)]
+        self.S = sparse.diags((1, S_temp), (0, 2), shape = (N+1, N+3), format = 'csr')
+
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        #P_j - [j*(j+1)]/(j+2)(j+3)  *  P_j+2
+        if sympy:
+            return sp.legendre(j, x) - j*(j+1)/((j+2)*(j+3))*sp.legendre(j+2, x)
+        return Leg.basis(j) - j*(j+1)/((j+2)*(j+3))*Leg.basis(j + 2)
 
 
 class DirichletChebyshev(Composite, Chebyshev):
-
     def __init__(self, N, domain=(-1, 1), bc=(0, 0)):
         Chebyshev.__init__(self, N, domain=domain)
         self.B = Dirichlet(bc, domain, self.reference_domain)
@@ -332,10 +342,16 @@ class DirichletChebyshev(Composite, Chebyshev):
 
 class NeumannChebyshev(Composite, Chebyshev):
     def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0):
-        raise NotImplementedError
+        Chebyshev.__init__(self, N, domain=domain)
+        self.B = Neumann(bc, domain, self.reference_domain)
+        self.constraint = constraint
+        S_temp = [(-j/(j+2))**2 for j in range(N+1)]
+        self.S = sparse.diags((1, S_temp), (0, 2), shape=(N + 1, N + 3), format='csr')
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        if sympy:
+            return sp.cos(j * sp.acos(x)) - (-j/(j+2))**2*sp.cos((j + 2) * sp.acos(x))
+        return Cheb.basis(j) - (-j/(j+2))**2*Cheb.basis(j + 2)
 
 
 class BasisFunction:
