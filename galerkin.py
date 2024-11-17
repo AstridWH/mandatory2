@@ -223,15 +223,15 @@ class Cosines(Trigonometric):
 
     def basis_function(self, j, sympy=False):
         if sympy:
-            return sp.cos((j + 1) * sp.pi * x)
-        return lambda Xj: np.cos((j + 1) * np.pi * Xj)
+            return sp.cos((j) * sp.pi * x)
+        return lambda Xj: np.cos((j) * np.pi * Xj)
 
     def derivative_basis_function(self, j, k=1):
-        scale = ((j + 1) * np.pi) ** k * {0: 1, 1: -1}[((k+1) // 2) % 2]
+        scale = ((j) * np.pi) ** k * {0: 1, 1: -1}[(k // 2) % 2]
         if k % 2 == 0:
-            return lambda Xj: scale * np.cos((j + 1) * np.pi * Xj)
+            return lambda Xj: scale * np.cos((j) * np.pi * Xj)
         else:
-            return lambda Xj: scale * np.sin((j + 1) * np.pi * Xj)
+            return lambda Xj: scale * np.sin((j) * np.pi * Xj)
 
     def L2_norm_sq(self, N):
         #integral[0,1] cos^2(pi*x) dx
