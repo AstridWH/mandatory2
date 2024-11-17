@@ -118,7 +118,7 @@ class Legendre(FunctionSpace):
         return L2
 
     def mass_matrix(self):
-        mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N, self.N), format = 'csr')
+        mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N+1, self.N+1), format = 'csr')
         return mass
 
     def eval(self, uh, xj):
@@ -235,7 +235,9 @@ class Cosines(Trigonometric):
 
     def L2_norm_sq(self, N):
         #integral[0,1] cos^2(pi*x) dx = 0.5
-        return np.full(shape=N+1, fill_value=0.5)
+        ans = np.full(shape=N+1, fill_value=0.5)
+        ans[0] = 1
+        return ans
 
 # Create classes to hold the boundary function
 
