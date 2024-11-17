@@ -236,7 +236,7 @@ class Cosines(Trigonometric):
     def L2_norm_sq(self, N):
         #integral[0,1] cos^2(pi*x) dx = 0.5
         ans = np.full(shape=N+1, fill_value=0.5)
-        ans[0] = 1
+        #ans[0] = 1
         return ans
 
 # Create classes to hold the boundary function
