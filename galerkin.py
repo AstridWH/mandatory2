@@ -219,12 +219,12 @@ class Sines(Trigonometric):
 class Cosines(Trigonometric):
     def __init__(self, N, domain=(0, 1), bc=(0, 0)):
         Trigonometric.__init__(self, N, domain=domain)
-        self.B = Dirichlet(bc, domain, self.reference_domain)
+        self.B = Neumann(bc, domain, self.reference_domain)
 
     def basis_function(self, j, sympy=False):
         if sympy:
-            return sp.cos((j) * sp.pi * x)
-        return lambda Xj: np.cos((j) * np.pi * Xj)
+            return sp.cos(j * sp.pi * x)
+        return lambda Xj: np.cos(j * np.pi * Xj)
 
     def derivative_basis_function(self, j, k=1):
         scale = (j * np.pi) ** k * {0: 1, 1: -1}[(k // 2) % 2]
