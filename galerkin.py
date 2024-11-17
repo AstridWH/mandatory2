@@ -118,7 +118,7 @@ class Legendre(FunctionSpace):
         return L2
 
     def mass_matrix(self):
-        mass = sparse.diags(self.L2(self.N), 0, (self.N, self.N), format = 'csr')
+        mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N, self.N), format = 'csr')
         return mass
 
     def eval(self, uh, xj):
@@ -152,7 +152,7 @@ class Chebyshev(FunctionSpace):
         return L2
 
     def mass_matrix(self):
-        mass = sparse.diags(self.L2(self.N), 0, (self.N, self.N), format='csr')
+        mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N, self.N), format='csr')
         return mass
 
     def eval(self, uh, xj):
@@ -347,13 +347,13 @@ class NeumannChebyshev(Composite, Chebyshev):
         Chebyshev.__init__(self, N, domain=domain)
         self.B = Neumann(bc, domain, self.reference_domain)
         self.constraint = constraint
-        S_temp = [(-j/(j+2))**2 for j in range(N+1)]
+        S_temp = [-(j/(j+2))**2 for j in range(N+1)]
         self.S = sparse.diags((1, S_temp), (0, 2), shape=(N + 1, N + 3), format='csr')
 
     def basis_function(self, j, sympy=False):
         if sympy:
-            return sp.cos(j * sp.acos(x)) - (-j/(j+2))**2*sp.cos((j + 2) * sp.acos(x))
-        return Cheb.basis(j) - (-j/(j+2))**2*Cheb.basis(j + 2)
+            return sp.cos(j * sp.acos(x)) - (j/(j+2))**2*sp.cos((j + 2) * sp.acos(x))
+        return Cheb.basis(j) - (j/(j+2))**2*Cheb.basis(j + 2)
 
 
 class BasisFunction:
