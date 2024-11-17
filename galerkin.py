@@ -152,7 +152,7 @@ class Chebyshev(FunctionSpace):
         return L2
 
     def mass_matrix(self):
-        mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N, self.N), format='csr')
+        mass = sparse.diags(self.L2_norm_sq(self.N), 0, (self.N+1, self.N+1), format='csr')
         return mass
 
     def eval(self, uh, xj):
@@ -227,15 +227,15 @@ class Cosines(Trigonometric):
         return lambda Xj: np.cos((j) * np.pi * Xj)
 
     def derivative_basis_function(self, j, k=1):
-        scale = ((j) * np.pi) ** k * {0: 1, 1: -1}[(k // 2) % 2]
+        scale = (j * np.pi) ** k * {0: 1, 1: -1}[(k // 2) % 2]
         if k % 2 == 0:
-            return lambda Xj: scale * np.cos((j) * np.pi * Xj)
+            return lambda Xj: scale * np.cos(j * np.pi * Xj)
         else:
-            return lambda Xj: scale * np.sin((j) * np.pi * Xj)
+            return lambda Xj: scale * np.sin(j * np.pi * Xj)
 
     def L2_norm_sq(self, N):
-        #integral[0,1] cos^2(pi*x) dx
-        return 0.5
+        #integral[0,1] cos^2(pi*x) dx = 0.5
+        return np.full(shape=N+1, fill_value=0.5)
 
 # Create classes to hold the boundary function
 
